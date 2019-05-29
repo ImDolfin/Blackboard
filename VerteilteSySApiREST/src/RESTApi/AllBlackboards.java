@@ -28,9 +28,8 @@ public class AllBlackboards {
 		
 		//JSON parser object to parse read file
         JSONParser jsonParser = new JSONParser();
-        JSONArray jsonArray;
         JSONObject jsonObject = null;
-        String input =null;
+        String input = null;
          
         //try (FileReader reader = new FileReader("/data/model.json"))
         try (FileReader reader = new FileReader("C:\\Users\\U51210\\git\\verteiltsys\\VerteilteSySApiREST\\model.json"))
