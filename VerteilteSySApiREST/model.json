@@ -1,4 +1,10 @@
-{"0":
-	{"key1": "value1",
-	"key2": "value2"}
-}
+[
+  {
+    "name": "key1",
+    "text": "value1"
+  },
+  {
+    "name": "key2",
+    "text": "value2"
+  }
+]
