@@ -44,8 +44,22 @@ public class AllBlackboards {
 	// public Response saveBlackboards(@QueryParam("text") String text) {
 	 public void saveBlackboards(String text) {
 	  
+		Model model = new Model();
 		 
+		JSONObject jsonObject = new JSONObject();
+		JSONParser jsonParser = new JSONParser();
+		try {
+			jsonObject = (JSONObject) jsonParser.parse(text);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		model.setJsonObject(jsonObject);
+		
+		 /*
+		  
 		 try {
+			
 			 FileWriter fileWriter = new FileWriter("C:\\Users\\U51210\\git\\verteiltsys\\VerteilteSySApiREST\\model.json");
 			//JSONParser jsonParser = new JSONParser();
 			// jsonParser.parse(sku);
@@ -54,7 +68,7 @@ public class AllBlackboards {
 			 fileWriter.close(); 
 		 }catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 		 
 	        //return Response.status(200).build();
 		 
@@ -67,10 +81,11 @@ public class AllBlackboards {
 	{
 		File file = null;
 		String string = null;
-         
+		String path = new java.io.File("").getAbsolutePath(); 
+		
         file = new File("C:\\Users\\U51210\\git\\verteiltsys\\VerteilteSySApiREST\\model.txt");
-        string = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-        
+        string = this.getClass().getClassLoader().getResource("").getPath();
+        string = path;
 		/*
         File f = new File("scores.txt");
     	f.getAbsolutePath();
@@ -92,13 +107,17 @@ public class AllBlackboards {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getBlackboards()
 	{
-		//JSONObject blackboards = new JSONObject();
+		Model model = new Model();
+		JSONObject jsonObject = new JSONObject();
+		String string = null;
 		
-		//JSON parser object to parse read file
-        JSONParser jsonParser = new JSONParser();
+		jsonObject = model.getJsonObject();
+		string = jsonObject.toJSONString();
+		
+		/* JSONParser jsonParser = new JSONParser();
         JSONArray jsonArray = new JSONArray();
          
-        //try (FileReader reader = new FileReader("/data/model.json"))
+        
         try (FileReader reader = new FileReader("C:\\Users\\U51210\\git\\verteiltsys\\VerteilteSySApiREST\\model.json"))
         {
         	
@@ -112,20 +131,12 @@ public class AllBlackboards {
             e.printStackTrace();
         } catch (ParseException e) {
             e.printStackTrace();
-        }
-		/*
-        File f = new File("scores.txt");
-    	f.getAbsolutePath();
-    	input = f.getAbsolutePath();*/
-		
-		/*
-		InputStream input = Converter.class.getResourceAsStream("/data/model.json");
-		String allBlackboards;
-		allBlackboards = input.toString();
-		*/
+        }*/
 		
 		
-		//return jsonObject.toString();//
-        return jsonArray.toString();
+		
+		
+		return string;
+        //return jsonArray.toString();
 	}
 }
