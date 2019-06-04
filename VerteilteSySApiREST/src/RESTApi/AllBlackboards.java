@@ -17,10 +17,18 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.Timestamp;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
 
 import org.apache.commons.io.FileUtils;
 import org.json.*;
@@ -33,19 +41,21 @@ import org.json.simple.parser.*;
 
 @Path("/blackboards")
 public class AllBlackboards {
+	private static JSONObject jsonObject = new JSONObject();
+//	private HttpServletRequest servletRequest;
+	private static ArrayList<String> arrayList = new ArrayList<>();
+	 Calendar cal = Calendar.getInstance();
+	 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+     
 	
-	
-	
-	 @Path("/puttext")
-	 @PUT
-	 @Consumes(MediaType.APPLICATION_JSON)
-	 //@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	 //@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	// public Response saveBlackboards(@QueryParam("text") String text) {
-	 public void saveBlackboards(String text) {
+	 @Context HttpServletRequest servletRequestall; 
+	 @Path("/json")
+	 @POST
+	 @Consumes(MediaType.TEXT_PLAIN)
+	 
+	 public Response saveBlackboards(String text) {
 	  
-		Model model = new Model();
-		 
+		
 		JSONObject jsonObject = new JSONObject();
 		JSONParser jsonParser = new JSONParser();
 		try {
@@ -54,38 +64,67 @@ public class AllBlackboards {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		model.setJsonObject(jsonObject);
+		AllBlackboards.jsonObject = jsonObject;
 		
-		 /*
-		  
-		 try {
-			
-			 FileWriter fileWriter = new FileWriter("C:\\Users\\U51210\\git\\verteiltsys\\VerteilteSySApiREST\\model.json");
-			//JSONParser jsonParser = new JSONParser();
-			// jsonParser.parse(sku);
-			 fileWriter.write(text);
-			 fileWriter.flush(); 
-			 fileWriter.close(); 
-		 }catch (IOException e) {
-			e.printStackTrace();
-		}*/
-		 
-	        //return Response.status(200).build();
+		
+		arrayList.add("TIMESTAMP: "+ sdf.format(cal.getTime())+ "   IP-Adresse: "+ servletRequestall.getRemoteAddr() + " hat ein neues Blackboard erstellt </br>");
+		
+		return Response.ok() //200
+				.entity(null)
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST")
+				.build();
+		
 		 
 	}
+	// 
+	
+//	 @Context HttpServletRequest servletRequest; 
+	 @Context HttpServletRequest servletRequestdel; 
+	 @Path("/delete")
+	 @POST
+	 @Consumes(MediaType.TEXT_PLAIN)
+	 //@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	 //@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	// public Response saveBlackboards(@QueryParam("text") String text) {
+	 public Response deleteBlackboards(String removekey) {
 	 
+		arrayList.add("TIMESTAMP: "+ sdf.format(cal.getTime())+ "   IP-Adresse: "+ servletRequestdel.getRemoteAddr() + " hat Blackboard mit dem Namen " + removekey + " geloescht </br>");
+		 
+		JSONObject jsonObject = new JSONObject(); 
+		int size = AllBlackboards.jsonObject.size();
+		
+		for(int i=0;i<size;i++) {
+			
+			jsonObject = (JSONObject) AllBlackboards.jsonObject.get(Integer.toString(i));
+			String key = (String) jsonObject.get("name");
+			if(removekey.equals(key)) {
+				AllBlackboards.jsonObject.remove(Integer.toString(i), jsonObject);
+				break;
+			}
+		}
+		
+		return Response.ok() //200
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST")
+				.build();
+		
+		 
+	}
+	
+	
 	@Path("/text") 
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getText() throws IOException  
 	{
-		File file = null;
+	//	File file = null;
 		String string = null;
-		String path = new java.io.File("").getAbsolutePath(); 
+		//String path = new java.io.File("").getAbsolutePath(); 
 		
-        file = new File("C:\\Users\\U51210\\git\\verteiltsys\\VerteilteSySApiREST\\model.txt");
-        string = this.getClass().getClassLoader().getResource("").getPath();
-        string = path;
+		string = AllBlackboards.jsonObject.toString();
+  //      string = this.getClass().getClassLoader().getResource("").getPath();
+   //     string = path;
 		/*
         File f = new File("scores.txt");
     	f.getAbsolutePath();
@@ -102,17 +141,32 @@ public class AllBlackboards {
         return string;
 	}
 	
+	
+	@Context HttpServletRequest servletRequestget; 
 	@Path("/json") 
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public String getBlackboards()
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response getBlackboards()
 	{
-		Model model = new Model();
-		JSONObject jsonObject = new JSONObject();
+		
+		arrayList.add("TIMESTAMP: "+ sdf.format(cal.getTime())+ "   IP-Adresse: "+ servletRequestget.getRemoteAddr() + " hat alle Blackboards abgefragt </br>");
+	//	Model model = new Model();
 		String string = null;
 		
-		jsonObject = model.getJsonObject();
-		string = jsonObject.toJSONString();
+		string = AllBlackboards.jsonObject.toJSONString();
+		
+		return Response.ok() //200
+				.entity(string)
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST")
+				.build();
+		/*response.getHeaders().add("Access-Control-Allow-Origin", "*");
+        response.getHeaders().add("Access-Control-Allow-Headers",
+                "origin, content-type, accept, authorization");
+        response.getHeaders().add("Access-Control-Allow-Credentials", "true");
+        response.getHeaders().add("Access-Control-Allow-Methods",
+                "GET, POST, PUT, DELETE, OPTIONS, HEAD");*/
+
 		
 		/* JSONParser jsonParser = new JSONParser();
         JSONArray jsonArray = new JSONArray();
@@ -136,7 +190,29 @@ public class AllBlackboards {
 		
 		
 		
-		return string;
+//		return string;
         //return jsonArray.toString();
 	}
+	
+	
+	@Path("/log") 
+	@GET
+	@Produces(MediaType.TEXT_HTML)
+	public Response getIP() throws IOException  
+	{
+		String string =null;
+        if(arrayList.isEmpty()) {
+        	string = "empty";
+        }
+        else {
+        	string = arrayList.toString();
+        }
+        return Response.ok() //200
+        		.entity(string)
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST")
+				.build();
+	}
+	
+	
 }
