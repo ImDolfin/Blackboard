@@ -67,7 +67,7 @@ public class AllBlackboards {
 		AllBlackboards.jsonObject = jsonObject;
 		
 		
-		arrayList.add("TIMESTAMP: "+ sdf.format(cal.getTime())+ "   IP-Adresse: "+ servletRequestall.getRemoteAddr() + " hat ein neues Blackboard erstellt </br>");
+		arrayList.add("TIMESTAMP (UTC): "+ sdf.format(cal.getTime())+ "   IP-Adresse: "+ servletRequestall.getRemoteAddr() + " hat ein neues Blackboard erstellt </br>");
 		
 		return Response.ok() //200
 				.entity(null)
@@ -89,7 +89,7 @@ public class AllBlackboards {
 	// public Response saveBlackboards(@QueryParam("text") String text) {
 	 public Response deleteBlackboards(String removekey) {
 	 
-		arrayList.add("TIMESTAMP: "+ sdf.format(cal.getTime())+ "   IP-Adresse: "+ servletRequestdel.getRemoteAddr() + " hat Blackboard mit dem Namen " + removekey + " geloescht </br>");
+		arrayList.add("TIMESTAMP (UTC): "+ sdf.format(cal.getTime())+ "   IP-Adresse: "+ servletRequestdel.getRemoteAddr() + " hat Blackboard mit dem Namen " + removekey + " geloescht </br>");
 		 
 		JSONObject jsonObject = new JSONObject(); 
 		int size = AllBlackboards.jsonObject.size();
@@ -149,7 +149,7 @@ public class AllBlackboards {
 	public Response getBlackboards()
 	{
 		
-		arrayList.add("TIMESTAMP: "+ sdf.format(cal.getTime())+ "   IP-Adresse: "+ servletRequestget.getRemoteAddr() + " hat alle Blackboards abgefragt </br>");
+		arrayList.add("TIMESTAMP (UTC): "+ sdf.format(cal.getTime())+ "   IP-Adresse: "+ servletRequestget.getRemoteAddr() + " hat alle Blackboards abgefragt </br>");
 	//	Model model = new Model();
 		String string = null;
 		
@@ -194,12 +194,13 @@ public class AllBlackboards {
         //return jsonArray.toString();
 	}
 	
-	
+	@Context HttpServletRequest servletRequestlog; 
 	@Path("/log") 
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public Response getIP() throws IOException  
 	{
+		arrayList.add("TIMESTAMP (UTC): "+ sdf.format(cal.getTime())+ "   IP-Adresse: "+ servletRequestget.getRemoteAddr() + " hat das Logging abgefragt </br>");
 		String string =null;
         if(arrayList.isEmpty()) {
         	string = "empty";
