@@ -229,6 +229,24 @@ class Blackboard {
 }
 
 /**
+* Eventhandler for the readystatechange event
+* Had to be solved as a global function because of asynchronous callbacks of xmlHttpOnReadyStateChange()
+* @Param XMLHttpRequest xmlHttp
+**/
+ 
+function xmlHttpOnReadyStateChange(xmlHttp) {
+  if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
+	// alert("Activity successfully finished"); // only commented, because it is only useful for debugging
+  }
+  else if (xmlHttp.readyState === 4 && (xmlHttp.status == "404" || xmlHttp.status == "409" )) {
+		alert(xmlHttp.responseText)
+	}
+  
+    b.getAllBlackboardNames();
+  }
+
+
+/**
  * Makes HTTP Request for @file
  * Calls @callback if request sucessfull (http 200)
  * @Param file String
