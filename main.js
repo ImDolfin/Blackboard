@@ -65,13 +65,13 @@ class Blackboard {
     xmlHttp.send(bodyOfData);
 
     // register onreadystate eventhandler
-    xmlHttp.onreadystatechange = this.xmlHttpOnReadyStateChange();
+    xmlHttp.onreadystatechange = this.xmlHttpOnReadyStateChange(xmlHttp);
   }
 
   /**
   * Eventhandler for the readystatechange event
   **/
-  xmlHttpOnReadyStateChange(){
+  xmlHttpOnReadyStateChange(xmlHttp){
     if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
       if(xmlHttp.responseText != ""){
         alert(xmlHttp.responseText);
