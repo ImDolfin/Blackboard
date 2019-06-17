@@ -260,19 +260,7 @@ function parseJSON(text) {
   console.log("269: " + text);
 }
 
-/**
- * Eventhandler for the readystatechange event
- * Had to be solved as a global function because of asynchronous callbacks of xmlHttpOnReadyStateChange()
- * @Param XMLHttpRequest xmlHttp
- **/
-function xmlHttpOnReadyStateChange(xmlHttp) {
-  if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
-    if (xmlHttp.responseText != "") {
-      alert(xmlHttp.responseText);
-    }
-    b.getAllBlackboardNames();
-  }
-}
+
 
 /*
 ===================================================================
@@ -294,7 +282,7 @@ const file = "http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/black
 var selectedBlackboard = null;
 
 var b = new Blackboard();
-readTextFile(file, parseJSON);
+b.getAllBlackboardNames();
 
 /**
  * Remove allBlackboards div form DOM, if it exist
