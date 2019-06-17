@@ -1,25 +1,26 @@
 .kacheln {
-	margin: 5px;
-	padding: 5px;
-	border-radius: 5px;
-	
-	background-color:coral;
-	height: auto;
-	display: inline-block;
+  margin: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: coral;
+  height: auto;
+  display: inline-block;
 }
-.kacheln:hover { 
+
+.kacheln:hover {
   background-color: #ff8e84;
 }
 
-#inputs{
+#inputs {
   display: block;
   flex-direction: row;
   justify-content: center;
   align-items: baseline;
   background-color: #d6d6d6;
-  max-width:100%;
+  max-width: 100%;
 }
-input[type=button]{
+
+input[type=button] {
   background-color: #d6d6d6;
   border: none;
   margin: 5px;
@@ -30,7 +31,8 @@ input[type=button]{
   #display: inline-block;
   font-size: 16px;
 }
-input[type=text]{
+
+input[type=text] {
   background-color: #4CAFA7;
   border: none;
   color: white;
@@ -40,11 +42,13 @@ input[type=text]{
   #display: inline-block;
   font-size: 16px;
 }
-.inputelement{
+
+.inputelement {
   flex-basis: auto;
   margin: auto;
 }
-#allBLackboards{
+
+#allBLackboards {
   display: flex;
   flex-direction: row;
   align-items: baseline

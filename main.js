@@ -1,6 +1,6 @@
- /**
-   * Class blackboards for saving loaded json object from api
-   **/
+/**
+ * Class blackboards for saving loaded json object from api
+ **/
 class Blackboard {
 
   constructor() {
@@ -23,9 +23,9 @@ class Blackboard {
    */
   setJSONData(jsonData) {
     this.boards = jsonData;
-  	console.log("boards is here");
-  	this.showAllBlackboardNames();
-  	console.log("reload finished");
+    console.log("boards is here");
+    this.showAllBlackboardNames();
+    console.log("reload finished");
   }
 
   /**
@@ -48,7 +48,7 @@ class Blackboard {
         logProperty = "post";
         break;
 
-      // delete
+        // delete
       case 1:
         url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/delete';
         logProperty = "delete";
@@ -63,10 +63,11 @@ class Blackboard {
     // send request
     xmlHttp.send(bodyOfData);
 
-    // register onreadystate eventhandler
-    xmlHttp.onreadystatechange = function(){
-		xmlHttpOnReadyStateChange(xmlHttp);
-	}
+    // register onreadystate eventhandler by creating a function that calls the function containing the logic
+    // (because of asynchronous callstructure - no direct call possible)
+    xmlHttp.onreadystatechange = function() {
+      xmlHttpOnReadyStateChange(xmlHttp);
+    }
   }
 
 
@@ -92,12 +93,11 @@ class Blackboard {
    */
   getLenght() {
     //this.updateJSONData();
-  	if(this.boards === null){
-  		return 0;
-  	}
-  	else{
-  	  return Object.keys(this.boards).length;
-  	}
+    if (this.boards === null) {
+      return 0;
+    } else {
+      return Object.keys(this.boards).length;
+    }
   }
 
   /**
@@ -126,8 +126,8 @@ class Blackboard {
    * @Param text String
    **/
   createBlackBoard(name, text) {
-	  let content = name +  "," + text + ",create";
-	  this.sendJSONToServer(content);
+    let content = name + "," + text + ",create";
+    this.sendJSONToServer(content);
   }
 
   /**
@@ -136,7 +136,7 @@ class Blackboard {
    * @Param name String
    **/
   deleteBlackBoard(name) {
-	  this.deleteJSONInServer(name);
+    this.deleteJSONInServer(name);
     console.log("117:" + name);
     console.log("119: gelöscht");
   }
@@ -148,7 +148,7 @@ class Blackboard {
    * @Param text String
    **/
   updateBlackboardContent(name, text) {
-	  let content = name  + "," + text + ",change";
+    let content = name + "," + text + ",change";
     this.sendJSONToServer(content);
   }
 
@@ -192,7 +192,7 @@ class Blackboard {
    * @Param name String
    **/
   clearBlackboardContent(name) {
-	  let content = name + ","  + ",change";
+    let content = name + "," + ",change";
     this.sendJSONToServer(content);
   }
 
@@ -204,7 +204,7 @@ class Blackboard {
     this.updateJSONData();
   }
 
-   /**
+  /**
    * Afterwards function showAllBlackboardNames is called, when data is received from API
    * The function creates an HTML div and creates for each blackbaord an HTML Element with a css style
    * Than the existing divs will be deleted and the new one appended
@@ -214,7 +214,7 @@ class Blackboard {
     blackboardsDiv.id = 'allBLackboards';
     let lenght = this.getLenght();
 
-    if (lenght >0) {
+    if (lenght > 0) {
       for (let i = 0; i < lenght; i++) {
         let nameOfBlackboard = document.createElement("h3");
         nameOfBlackboard.innerHTML = this.boards[i].name;
@@ -241,17 +241,15 @@ function readTextFile(file, callback) {
   console.log("get");
   rawFile.onreadystatechange = function() {
     if (rawFile.readyState === 4 && rawFile.status == "200") {
-	  clearResultDiv();
-	  if(rawFile.responseText == ""){
-		alert("Keine Blackboards vorhanden!");
-	  }
-	callback(rawFile.responseText);
+      clearResultDiv();
+      if (rawFile.responseText == "") {
+        alert("Keine Blackboards vorhanden!");
+      }
+      callback(rawFile.responseText);
     }
   }
   rawFile.send(null);
-
 }
-
 
 /**
  * Parses JSON and Calls setter of Blackboard
@@ -263,18 +261,23 @@ function parseJSON(text) {
 }
 
 /**
-* Eventhandler for the readystatechange event
-**/
-function xmlHttpOnReadyStateChange(xmlHttp){
+ * Eventhandler for the readystatechange event
+ * Had to be solved as a global function because of asynchronous callbacks of xmlHttpOnReadyStateChange()
+ * @Param XMLHttpRequest xmlHttp
+ **/
+function xmlHttpOnReadyStateChange(xmlHttp) {
   if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
-    if(xmlHttp.responseText != ""){
+    if (xmlHttp.responseText != "") {
       alert(xmlHttp.responseText);
     }
     b.getAllBlackboardNames();
   }
 }
+
 /*
-====================================================================================================================================
+===================================================================
+Operations for DOM
+===================================================================
 */
 const blackboardName = document.getElementById('newBlackboardName');
 const blackboardText = document.getElementById('newBlackboardText');
@@ -302,11 +305,8 @@ function clearResultDiv() {
   }
 }
 
-
-
-//---------------------------------------
+//-----------------------------------------------------------------
 // In this section, eventListeners are added to the specific Buttons
-
 
 //checks whether inputs are valid -> if not, an alert is thrown
 createBlackboardButton.addEventListener("click", function() {
@@ -386,5 +386,5 @@ checkEmptyButton.addEventListener("click", function() {
 
 //calls function getAllBlackboardNames
 showBlackboardsButton.addEventListener("click", function() {
-   b.getAllBlackboardNames();
+  b.getAllBlackboardNames();
 })
