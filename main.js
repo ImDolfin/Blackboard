@@ -65,20 +65,9 @@ class Blackboard {
     xmlHttp.send(bodyOfData);
 
     // register onreadystate eventhandler
-    xmlHttp.onreadystatechange = this.xmlHttpOnReadyStateChange(xmlHttp);
+    xmlHttp.onreadystatechange = xmlHttpOnReadyStateChange(xmlHttp);
   }
 
-  /**
-  * Eventhandler for the readystatechange event
-  **/
-  xmlHttpOnReadyStateChange(xmlHttp){
-    if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
-      if(xmlHttp.responseText != ""){
-        alert(xmlHttp.responseText);
-      }
-      this.getAllBlackboardNames();
-    }
-  }
 
   /**
    * Sends JSON Data to Server (only necessary content) via XMLHttpRequest
@@ -272,7 +261,17 @@ function parseJSON(text) {
   console.log("269: " + text);
 }
 
-
+/**
+* Eventhandler for the readystatechange event
+**/
+function xmlHttpOnReadyStateChange(xmlHttp){
+  if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
+    if(xmlHttp.responseText != ""){
+      alert(xmlHttp.responseText);
+    }
+    b.getAllBlackboardNames();
+  }
+}
 /*
 ====================================================================================================================================
 */
