@@ -44,15 +44,15 @@ class Blackboard {
     switch (type) {
       // send
       case 0: // und es kommt immer status 200 zurück, auch wenn
-       // url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json';
-	   url = 'http://localhost:8080/VerteilteSysApiREST/rest/blackboards/json';
+       url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json';
+//	   url = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/json';
         logProperty = "post";
         break;
 
         // delete
       case 1:
-        //url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/delete';
-		url = 'http://localhost:8080/VerteilteSysApiREST/rest/blackboards/delete';
+        url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/delete';
+//		url = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/delete';
         logProperty = "delete";
         break;
     }
@@ -262,7 +262,7 @@ function readTextFile(file, callback) {
   rawFile.onreadystatechange = function() {
     if (rawFile.readyState === 4 && rawFile.status == "200") {
       clearResultDiv();
-      if (rawFile.responseText == "") {
+      if (rawFile.responseText == "{}") {
         alert("Keine Blackboards vorhanden!");
       }
       callback(rawFile.responseText);
@@ -297,8 +297,8 @@ const clearContentButton = document.getElementById('clearBlackboardContent');
 const checkEmptyButton = document.getElementById('checkEmptyBlackboardContent'); //alles abchecken
 const showBlackboardsButton = document.getElementById('showAllBlackboards'); // warum 2x aufrufen bis geht?
 
-// const file = "http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json";
-const file = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/json';
+ const file = "http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json";
+//const file = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/json';
 
 			  
 
