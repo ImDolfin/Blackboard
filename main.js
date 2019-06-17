@@ -43,14 +43,16 @@ class Blackboard {
 
     switch (type) {
       // send
-      case 0:
-        url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json';
+      case 0: // und es kommt immer status 200 zurück, auch wenn
+       // url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json';
+	   url = 'http://localhost:8080/VerteilteSysApiREST/rest/blackboards/json';
         logProperty = "post";
         break;
 
         // delete
       case 1:
-        url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/delete';
+        //url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/delete';
+		url = 'http://localhost:8080/VerteilteSysApiREST/rest/blackboards/delete';
         logProperty = "delete";
         break;
     }
@@ -235,13 +237,13 @@ class Blackboard {
 **/
  
 function xmlHttpOnReadyStateChange(xmlHttp) {
+	console.log(xmlHttp.status);
   if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
 	// alert("Activity successfully finished"); // only commented, because it is only useful for debugging
   }
   else if (xmlHttp.readyState === 4 && (xmlHttp.status == "404" || xmlHttp.status == "409" )) {
-		alert(xmlHttp.responseText)
+		alert(xmlHttp.responseText);
 	}
-  
     b.getAllBlackboardNames();
   }
 
@@ -295,7 +297,11 @@ const clearContentButton = document.getElementById('clearBlackboardContent');
 const checkEmptyButton = document.getElementById('checkEmptyBlackboardContent'); //alles abchecken
 const showBlackboardsButton = document.getElementById('showAllBlackboards'); // warum 2x aufrufen bis geht?
 
-const file = "http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json";
+// const file = "http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json";
+const file = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/json';
+
+			  
+
 //const file = "blackboards.json";
 var selectedBlackboard = null;
 
