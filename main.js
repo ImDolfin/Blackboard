@@ -4,8 +4,7 @@
 class Blackboard {
 
   constructor() {
-    this.urlToSend = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json';
-    this.urlToDelete = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/delete';
+
   }
 
 
@@ -45,13 +44,13 @@ class Blackboard {
     switch (type) {
       // send
       case 0:
-        url = this.urlToSend;
+        url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json';
         logProperty = "post";
         break;
 
       // delete
       case 1:
-        url = this.urlToDelete;
+        url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/delete';
         logProperty = "delete";
         break;
     }
@@ -65,7 +64,7 @@ class Blackboard {
     xmlHttp.send(bodyOfData);
 
     // register onreadystate eventhandler
-    xmlHttp.onreadystatechange = xmlHttpOnReadyStateChange(xmlHttp);
+    xmlHttp.onreadystatechange = xmlHttpOnReadyStateChange(this);
   }
 
 
