@@ -220,7 +220,7 @@ public class AllBlackboards {
 					removekey + "' loeschen. FEHLGESCHLAGEN - BLACKBOARD NICHT EXISTENT");
 		}
 		Response.Status status;
-		if(error = NOT_FOUND) {
+		if(error == NOT_FOUND) {
 			status = Response.Status.NOT_FOUND; //404
 		}
 		else {
