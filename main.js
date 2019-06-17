@@ -64,7 +64,9 @@ class Blackboard {
     xmlHttp.send(bodyOfData);
 
     // register onreadystate eventhandler
-    xmlHttp.onreadystatechange = xmlHttpOnReadyStateChange(this);
+    xmlHttp.onreadystatechange = function(){
+		xmlHttpOnReadyStateChange(xmlHttp);
+	}
   }
 
 
