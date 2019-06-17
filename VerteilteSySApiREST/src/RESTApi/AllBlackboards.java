@@ -171,12 +171,10 @@ public class AllBlackboards {
 	public Response deleteBlackboards(String removekey) {
 	 
 		JSONObject jsonObject = new JSONObject(); 
-		int size = AllBlackboards.jsonObject.size();
 		int repl;
 		boolean once = false;
 		boolean exists = false;
 		String error = null;
-		JSONObject smalljsonObject = new JSONObject();
 		
 		// In the following loop it is searched whether a blackboard already exists 
 		// in the static JSONObject with the requested blackkboard name		
@@ -309,6 +307,8 @@ public class AllBlackboards {
 	 * 													 false means it does not exist
 	 */
 	private boolean checkForObjectsExistence(String blackboardName) {
+		int size = AllBlackboards.jsonObject.size();
+		JSONObject smalljsonObject = new JSONObject();
 		boolean exists = false;
 		for(int i=0;i<size;i++) {
 			smalljsonObject = (JSONObject) AllBlackboards.jsonObject.get(Integer.toString(i));
