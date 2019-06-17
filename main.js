@@ -64,14 +64,19 @@ class Blackboard {
     // send request
     xmlHttp.send(bodyOfData);
 
-    // eventhandler for the readystatechange event
-    xmlHttp.onreadystatechange = function(){
-      if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
-        if(xmlHttp.responseText != ""){
-          alert(xmlHttp.responseText);
-        }
-        this.getAllBlackboardNames();
+    // register onreadystate eventhandler
+    xmlHttp.onreadystatechange = this.xmlHttpOnReadyStateChange();
+  }
+
+  /**
+  * Eventhandler for the readystatechange event
+  **/
+  xmlHttpOnReadyStateChange(){
+    if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
+      if(xmlHttp.responseText != ""){
+        alert(xmlHttp.responseText);
       }
+      this.getAllBlackboardNames();
     }
   }
 
