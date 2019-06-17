@@ -27,8 +27,8 @@ public class AllBlackboards {
 	// original JSON file, but the path is not visible on Amazon aws	
 	private static JSONObject jsonObject = new JSONObject();		
 	
-	private const String NOT_FOUND = "Blackboard does not exist!"; 
-	private const String EXISTS_ALREADY = "Blackboard already exists :) !",
+	private final String NOT_FOUND = "Blackboard does not exist!"; 
+	private final String EXISTS_ALREADY = "Blackboard already exists :) !";
 		
 	// Data storage for LOGGING
 	private static String logstring = "";								
@@ -83,7 +83,7 @@ public class AllBlackboards {
 
 		// In the following loop it is searched whether a blackboard already 
 		// exists in the static JSONObject with the requested blackboard name
-		exists = checkForObjectsExistence(substrings[0]);
+		exists = checkForObjectsExistence(substrings[0],size);
 		
 		/*
 		 * here  the 4 possible cases ( blackboard exists and mode create,
@@ -175,10 +175,11 @@ public class AllBlackboards {
 		boolean once = false;
 		boolean exists = false;
 		String error = null;
+		int size = AllBlackboards.jsonObject.size();
 		
 		// In the following loop it is searched whether a blackboard already exists 
 		// in the static JSONObject with the requested blackkboard name		
-		exists = checkForObjectsExistence(removekey);
+		exists = checkForObjectsExistence(removekey,size);
 		
 		/* 	
 		 * If the blackboard that shall be deleted exists, 
@@ -193,6 +194,7 @@ public class AllBlackboards {
 		 * since a "foreach function" for iterating the JSON object is not available
 		 */
 		if(exists) {
+			
 			for(int i=0;i<size;i++) {		
 				jsonObject = (JSONObject) AllBlackboards.jsonObject.get(Integer.toString(i));
 				String key = (String) jsonObject.get("name");
@@ -220,7 +222,7 @@ public class AllBlackboards {
 					removekey + "' loeschen. FEHLGESCHLAGEN - BLACKBOARD NICHT EXISTENT");
 		}
 		Response.Status status;
-		if(error = NOT_FOUND) {
+		if(error == NOT_FOUND) {
 			status = Response.Status.NOT_FOUND; //404
 		}
 		else {
@@ -306,8 +308,8 @@ public class AllBlackboards {
 	 * @return boolean indicating if the object exists ->true means it exists
 	 * 													 false means it does not exist
 	 */
-	private boolean checkForObjectsExistence(String blackboardName) {
-		int size = AllBlackboards.jsonObject.size();
+	private boolean checkForObjectsExistence(String blackboardName, int size) {
+		
 		JSONObject smalljsonObject = new JSONObject();
 		boolean exists = false;
 		for(int i=0;i<size;i++) {
