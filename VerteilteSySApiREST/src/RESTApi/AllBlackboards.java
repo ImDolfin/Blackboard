@@ -18,87 +18,93 @@ import javax.ws.rs.core.Context;
 import org.json.simple.JSONObject;
 
 
-
 @Path("/blackboards")
 public class AllBlackboards {
-	private static JSONObject jsonObject = new JSONObject();			//Create a static JSON object as a data store
-																		// The structure of each blackboard in the JSONObject is as follows:
-																		// {number:jsonObject} -> The jsonObject again has the structure:
-																		// {"name": blackboardname, "text": blackboardcontent}
-																		//original JSON file, but the path is not visible on Amazon aws
-	private static String logstring = "";								//Data storage for LOGGING
-	 Calendar cal = Calendar.getInstance();								//Object for displaying the current date, with date format
-	 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-	 SimpleDateFormat sdfdate = new SimpleDateFormat("yyyy-MM-dd");
+	// Create a static JSON object as a data store
+	// The structure of each blackboard in the JSONObject is as follows:
+	// {number:jsonObject} -> The jsonObject again has the structure:
+	// {"name": blackboard name, "text": blackboard content}
+	// original JSON file, but the path is not visible on Amazon aws	
+	private static JSONObject jsonObject = new JSONObject();		
+	
+	private const String NOT_FOUND = "Blackboard does not exist!"; 
+	private const String EXISTS_ALREADY = "Blackboard already exists :) !",
+		
+	// Data storage for LOGGING
+	private static String logstring = "";								
+	// Object for displaying the current date, with date format
+	private Calendar cal = Calendar.getInstance();								
+	private SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+	private SimpleDateFormat sdfdate = new SimpleDateFormat("yyyy-MM-dd");
      
+	
+	/* the reason why PUT and DELETE is not added to the API querys is, that
+	 * only GET and POST works, without any CORS policy error from Amazon aws 
+	 * that is thrown. It's easy to fix for amazon APIs, but we have moved a ".war" -
+	 * file to the server, which itself contains the API 
+	 * we have not managed to fix this error
+	 */
 	 
-	 /*
-	  * Method: saveBlackboards, POST
-	  * Path: /rest/blackboards/json
-	  * Input: TEXT
-	  * Returned value: Response -> Header, Content
-	  * Description: This method is used to create new blackboards and modify the existing content of a blackboard.
-	  * 
-	  */
+	
+	
+	/**
+	 * Method: saveBlackboards, POST
+	 * Path: /rest/blackboards/json
+	 * HttpServletRequest is required to output the remote IP address
+	 * Textplain is used instead of APPLICATION_JSON, otherwise a 																	
+	 * PREFLIGHT-Request is triggered -> we  could not handle this kind of Requests
+	 * as described later
+	 * Description: This method is used to create new blackboards and modify the existing content of a blackboard.
+	 * @param: text String contains "name", "text" of a blackboard, as well as the information
+	 * 		"create" or "change" to create or change the blackboard
+	 * @return Response -> Header, Content
+	 */
+	@Context HttpServletRequest servletRequestAll; 					
+	@Path("/json")
+	@POST
+	@Consumes(MediaType.TEXT_PLAIN) 									
+	@Produces(MediaType.TEXT_PLAIN) 	
+	public Response saveBlackboards(String text) { 
 
-	 @Context HttpServletRequest servletRequestall; 					// HttpServletRequest is required to output the remote IP address
-	 @Path("/json")
-	 @POST
-	 @Consumes(MediaType.TEXT_PLAIN) 									//Textplain is used instead of APPLICATION_JSON, otherwise a 
-	 @Produces(MediaType.TEXT_PLAIN) 									//PREFLIGHT-Request is triggered -> we  could not handle this kind of Requests
-	 																	//as described later
-	 
-	 public Response saveBlackboards(String text) { 					//String contains "name", "text" of a blackboard, as well as the information
-		 																//"create" or "change" to create or change the blackboard
-		 
-		 String[] substrings = text.split(","); 						// Split the string into substrings
-		 boolean exists = false;										
-		 String error = null;
-		 String mode = null;
-		 int size = AllBlackboards.jsonObject.size();
-		 JSONObject smalljsonObject = new JSONObject();					
-		 
-		 
-		
-		JSONObject jsonObject = new JSONObject(); 							//a json object is created here, which represents a blackboard
-		jsonObject.put("name", substrings[0]); 								//with that the blackboard exists, but is not yet in the static 
-		jsonObject.put("text", substrings[1]); 								//jsonObject added
-		mode = substrings[2]; 												// here the mode (create or change) is defined
-		
-																			// the reason why PUT and DELETE is not added to the API querys is, that
-																			// only GET and POST works, without any CORS policy error from Amazon aws 
-																			//that is thrown. It's easy to fix for amazon APIs, but we have moved a ".war" -
-																			//file to the server, which itself contains the API 
-																			// we have not managed to fix this error
+		// Split the string into substrings
+		String[] substrings = text.split(","); 						
+		boolean exists = false;										
+		String error = null;
+		String mode = null;
+		int size = AllBlackboards.jsonObject.size();
+		JSONObject smalljsonObject = new JSONObject();					
+		//a json object is created here, which represents a blackboard
+		JSONObject jsonObject = new JSONObject(); 							
+		//with that the blackboard exists, but is not yet added in the static jsonObject 
+		jsonObject.put("name", substrings[0]); 								 
+		jsonObject.put("text", substrings[1]); 								
+		// here the mode (create or change) is defined
+		mode = substrings[2]; 												
 
-		// In the following loop it is searched whether a blackboard already exists in the static JSONObject with the requested blackboard name
+		// In the following loop it is searched whether a blackboard already 
+		// exists in the static JSONObject with the requested blackboard name
+		exists = checkForObjectsExistence(substrings[0]);
 		
-		for(int i=0;i<size;i++) {
-			smalljsonObject = (JSONObject) AllBlackboards.jsonObject.get(Integer.toString(i));
-			String string = (String) smalljsonObject.get("name");
-			if(string.equals(substrings[0])) {
-				exists = true;
-			 }
-		}
+		/*
+		 * here  the 4 possible cases ( blackboard exists and mode create,
+		 *								blackboard exists and mode change,
+		 *								blackboard does not exist and mode create,
+		 *								blackboard does not exist and mode change,
+		 * are treated and output accordingly
+		 */
 		
-		//here  the 4 possible cases (blackboard exists and mode create,
-										// blackboard exists and mode change,
-										// blackboard does not exist and mode create,
-										// blackboard does not exist and mode change,
-		// are treated and output accordingly
-		
-		
-		//exist & create: - Output: Log entry: already existing blackboard
+		// exist & create: - Output: Log entry: already existing blackboard
 						//- Output: errortext	
 		if(exists && mode.equals("create"))
 		{
-			error = "Blackboard already exists :) !";
-			logstring = logstring.concat("<tr><td>TIMESTAMP (UTC): "+ sdfdate.format(cal.getTime()) + " - " + sdf.format(cal.getTime())+ "</td><td>IP-Adresse: "+ servletRequestall.getRemoteAddr() + "</td><td>wollte ein neues Blackboards mit dem Namen '" + substrings[0] + "' erstellen. FEHLGESCHLAGEN: BLACKBOARD BEREITS EXISTENT</td></tr>");
-			
+			error = EXISTS_ALREADY;
+			createLogEntry(servletRequestAll.getRemoteAddr(),
+					"wollte ein neues Blackboards mit dem Namen '" + substrings[0] + 
+					"' erstellen. FEHLGESCHLAGEN: BLACKBOARD BEREITS EXISTENT");
 		}
 		
-		//exist & change: - Output: Log entry: change of blackboardcontens
-						//- Activity: save blackboard in static jsonObject
+		// exist & change: - Output: Log entry: change of blackboardcontens
+		//				   - Activity: save blackboard in static jsonObject
 		else if(exists && mode.equals("change")) {
 			for(int i=0;i<size;i++) {
 				smalljsonObject = (JSONObject) AllBlackboards.jsonObject.get(Integer.toString(i));
@@ -108,48 +114,61 @@ public class AllBlackboards {
 					AllBlackboards.jsonObject.put(Integer.toString(i), smalljsonObject);
 				}
 			}
-			logstring = logstring.concat("<tr><td>TIMESTAMP (UTC): "+ sdf.format(cal.getTime())+ "</td><td>IP-Adresse: "+ servletRequestall.getRemoteAddr() + "</td><td>hat den Inhalt des Blackboards mit dem Namen '" + substrings[0] + "' geaendert</td></tr>");
-			
-			//not exist & create: - Output: Log entry: create a new blackboard
-								//- Activity: save blackboard in static jsonObject	
+			createLogEntry(servletRequestAll.getRemoteAddr(),
+					"hat den Inhalt des Blackboards mit dem Namen '" + 
+					substrings[0] + "' geaendert");
 		}
-		else if(exists==false && mode.equals("create")) {
+		// not exist & create: - Output: Log entry: create a new blackboard
+		//					   - Activity: save blackboard in static jsonObject	
+		else if(!exists && mode.equals("create")) {
 			AllBlackboards.jsonObject.put(Integer.toString(size), jsonObject);
-			logstring = logstring.concat("<tr><td>TIMESTAMP (UTC): "+ sdfdate.format(cal.getTime()) + " - " + sdf.format(cal.getTime())+ "</td><td>IP-Adresse: "+ servletRequestall.getRemoteAddr() + "</td><td>hat ein neues Blackboard mit dem Namen '" + substrings[0] + "' erstellt</td></tr>");
-			
+			createLogEntry(servletRequestAll.getRemoteAddr(), 
+					"hat ein neues Blackboard mit dem Namen '" + 
+					substrings[0] + "' erstellt");			
+		}
+		// not exist & change: - Output: Log entry: blackboard does not exist
+		//					   - Output: errortext
+		else if(!exists && mode.equals("change")) {
+			error = NOT_FOUND;
+			createLogEntry(servletRequestAll.getRemoteAddr(),
+					"wollte den Inhalt des Blackboards mit dem Namen '" + 
+					substrings[0] + 
+					"' aendern. FEHLGESCHLAGEN - BLACKBOARD NICHT EXISTENT");		
+		}
+		Response.Status status;
+		if(error == EXISTS_ALREADY) {
+			status = Response.Status.CONFLICT; //409
+		}
+		else if(error == NOT_FOUND) {
+			status = Response.Status.NOT_FOUND; //404
+
+		}
+		else {
+			status = Response.Status.OK; //200
 		}
 		
-		//not exist & change: - Output: Log entry: blackboard does not exist
-							//- Output: errortext
-		else if(exists==false && mode.equals("change")) {
-			error = "Blackboard doesn't exist :) !";
-			logstring = logstring.concat("<tr><td>TIMESTAMP (UTC): "+ sdfdate.format(cal.getTime()) + " - " + sdf.format(cal.getTime())+ "</td><td>IP-Adresse: "+ servletRequestall.getRemoteAddr() + "</td><td>wollte den Inhalt des Blackboards mit dem Namen '" + substrings[0] + "' aendern. FEHLGESCHLAGEN - BLACKBOARD NICHT EXISTENT</td></tr>");
-			
-		}
-		
-		return Response.ok() //200
+		return Response.status(status)
 				.entity(error)
 				.header("Access-Control-Allow-Origin", "*")
 				.header("Access-Control-Allow-Methods", "GET, POST")
 				.build();
 	}
-
 	 
-	 /*
-	  * Method: deleteBlackboards, POST
-	  * Path: /rest/blackboards/delete
-	  * Input: TEXT
-	  * Returned value: Response -> Header, Content
-	  * Description: This method is used to delete a blackboard. Either an error text is returned, if the error text is not
-	  * deleting blackbaord does not exist, or the blackboard is deleted
-	  */
-	
-	 @Context HttpServletRequest servletRequestdel; 
-	 @Path("/delete")
-	 @POST
-	 @Consumes(MediaType.TEXT_PLAIN)
-	 @Produces(MediaType.TEXT_PLAIN)
-	 public Response deleteBlackboards(String removekey) {
+	/**
+	 * Method: deleteBlackboards, POST
+	 * Path: /rest/blackboards/delete
+	 * Description: This method is used to delete a blackboard. 
+	 * Either the error text "Blackboard is not existing!" 
+	 * is returned on fail, or the blackboard is deleted.
+	 * @param removekey
+	 * @return Response -> Header, Content
+	 */
+	@Context HttpServletRequest servletRequestDelete; 
+	@Path("/delete")
+	@POST
+	@Consumes(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response deleteBlackboards(String removekey) {
 	 
 		JSONObject jsonObject = new JSONObject(); 
 		int size = AllBlackboards.jsonObject.size();
@@ -159,30 +178,24 @@ public class AllBlackboards {
 		String error = null;
 		JSONObject smalljsonObject = new JSONObject();
 		
+		// In the following loop it is searched whether a blackboard already exists 
+		// in the static JSONObject with the requested blackkboard name		
+		exists = checkForObjectsExistence(removekey);
 		
-		// In the following loop it is searched whether a blackboard already exists in the static JSONObject with the requested blackkboard name
-		
-		for(int i=0;i<size;i++) {
-			smalljsonObject = (JSONObject) AllBlackboards.jsonObject.get(Integer.toString(i));
-			String string = (String) smalljsonObject.get("name");
-			if(string.equals(removekey)) {
-				exists = true;
-			 }
-		}
-		
-		
-		// In the following loop, if the blackboard to be deleted exists, it is removed from the static JSON object
-		//After that the numbers of the blackboards above are lowered again in such a way that a series of numbers is created.
-		//Example: jsonobjekt: b1,b2,b3,b4,b5
-		// delete the b3
-		// left: b1,b2,b4,b5
-		//set the numbers: b1, b2, b3, b4
-		// this facilitates the client-side query of the blackboards, since a "foreach function" for iterating the JSON object is not available
-
-
+		/* 	
+		 * If the blackboard that shall be deleted exists, 
+		 * it is removed from the static JSON object in the following loop.
+		 * After that the numbers of the blackboards above are lowered 
+		 * again in such a way that a continuous series of numbers is created.
+		 * Example: jsonobject: b1,b2,b3,b4,b5
+		 * delete the b3
+		 * left: b1,b2,b4,b5
+		 * set the numbers: b1, b2, b3, b4
+		 * this facilitates the client-side query of the blackboards, 
+		 * since a "foreach function" for iterating the JSON object is not available
+		 */
 		if(exists) {
-			for(int i=0;i<size;i++) {
-				
+			for(int i=0;i<size;i++) {		
 				jsonObject = (JSONObject) AllBlackboards.jsonObject.get(Integer.toString(i));
 				String key = (String) jsonObject.get("name");
 				if(once) {
@@ -196,91 +209,128 @@ public class AllBlackboards {
 				}
 			}
 			
-			//as soon as the deletion is done, the logging is called 
-			logstring = logstring.concat("<tr><td>TIMESTAMP (UTC): "+ sdfdate.format(cal.getTime()) + " - " + sdf.format(cal.getTime())+ "</td><td>IP-Adresse: "+ servletRequestdel.getRemoteAddr() + "</td><td>hat Blackboard mit dem Namen '" + removekey + "' geloescht</td></tr>");
-		}			
-		else {//if the blackboard does not exist the logging and error text will be ejected
-			error = "Blackboard is not existing!";
-			logstring = logstring.concat("<tr><td>TIMESTAMP (UTC): "+ sdfdate.format(cal.getTime()) + " - " + sdf.format(cal.getTime())+ "</td><td>IP-Adresse: "+ servletRequestdel.getRemoteAddr() + "</td><td>wollte das Blackboard mit dem Namen '" + removekey + "' loeschen. FEHLGESCHLAGEN - BLACKBOARD NICHT EXISTENT</td></tr>");
+			// as soon as the deletion is done, the logging is called 
+			createLogEntry(servletRequestDelete.getRemoteAddr(), 
+					"hat Blackboard mit dem Namen '" + 
+					removekey + "' geloescht");
+		}		
+		// if the blackboard does not exist the logging and error text will be ejected
+		else {
+			error = NOT_FOUND;
+			createLogEntry(servletRequestDelete.getRemoteAddr(),
+					"wollte das Blackboard mit dem Namen '" + 
+					removekey + "' loeschen. FEHLGESCHLAGEN - BLACKBOARD NICHT EXISTENT");
 		}
-		
-		return Response.ok() //200
+		Response.Status status;
+		if(error = NOT_FOUND) {
+			status = Response.Status.NOT_FOUND; //404
+		}
+		else {
+			status = Response.Status.OK; //200
+		}
+		return Response.status(status)
 				.entity(error)
 				.header("Access-Control-Allow-Origin", "*")
 				.header("Access-Control-Allow-Methods", "GET, POST")
-				.build();
-		
-		 
+				.build();	 
 	}
 	
-	
-	 
-	 /*
-	  * Method: getBlackboards, GET
-	  * Path: /rest/blackboards/json
-	  * Input: -
-	  * Returned value: Response -> Header, Content
-	  * Description: This method returns all blackboards stored in the static JSON object.
-	  * The return is as method type: text_plain and not as application_json for the reasons mentioned above.
-	  */
-	 
-	@Context HttpServletRequest servletRequestget; 
+	/**
+	 * Method: getBlackboards, GET
+	 * Path: /rest/blackboards/json
+	 * Description: This method returns all blackboards stored in the static JSON object.
+	 * The return is as method type: text_plain and not 
+	 * as application_json for the reasons mentioned above.
+	 * @return: Response -> Header, Content
+	 */
+	@Context HttpServletRequest servletRequestGet; 
 	@Path("/json") 
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response getBlackboards()
 	{
 		String string = null;
-		
-		
-		// Case 1: No blackboard available: - Output: Log entry: no backboard available
-		
-		if(AllBlackboards.jsonObject.size()==0) {
-			logstring = logstring.concat("<tr><td>TIMESTAMP (UTC): "+ sdfdate.format(cal.getTime()) + " - " + sdf.format(cal.getTime())+ "</td><td>IP-Adresse: "+ servletRequestget.getRemoteAddr() + "</td><td>hat alle Blackboards abgefragt! Es wurden " + AllBlackboards.jsonObject.size() + " Blackboards zurueckgegeben</td></tr>");
+	
+		// Case 1: No blackboard available: - Output: Log entry: no blackboard available	
+		if(AllBlackboards.jsonObject.size() == 0) {
+			createLogEntry(servletRequestGet.getRemoteAddr(),
+					"hat alle Blackboards abgefragt! Es wurden " + 
+					AllBlackboards.jsonObject.size() + " Blackboards zurueckgegeben");
 		}
-		// Case 2: Blackboard present: - output: log entry: x backboards returned
+		// Case 2: Blackboard present: - output: log entry: x blackboards returned
 		else {
-			logstring = logstring.concat("<tr><td>TIMESTAMP (UTC): "+ sdfdate.format(cal.getTime()) + " - " + sdf.format(cal.getTime())+ "</td><td>IP-Adresse: "+ servletRequestget.getRemoteAddr() + "</td><td>hat alle Blackboards abgefragt! Es wurden " + AllBlackboards.jsonObject.size() + " Blackboards zurueckgegeben</td></tr>");
+			createLogEntry(servletRequestGet.getRemoteAddr(), 
+					"hat alle Blackboards abgefragt! Es wurden " + 
+					AllBlackboards.jsonObject.size() + " Blackboards zurueckgegeben");
 		}
 		
-		// the JSON object is returned as string, also in case of an empty object -> (easier client-side processing)
-		string = AllBlackboards.jsonObject.toJSONString();
-		
+		// the JSON object is returned as string, also in case of 
+		// an empty object -> (easier client-side processing)
+		string = AllBlackboards.jsonObject.toJSONString();		
 		return Response.ok() //200
 				.entity(string)
 				.header("Access-Control-Allow-Origin", "*")
 				.header("Access-Control-Allow-Methods", "GET, POST")
-				.build();
-		
+				.build();	
 	}
-	
-	
-	
-	 /*
-	  * Method: getLog, GET
-	  * Path: /rest/blackboards/log
-	  * Input: -
-	  * Returned value: Response -> Header, Content
-	  * Description: This method returns all loggings stored in the static logstring. Together, these form a table
-	  * The logging is displayed since the server was started and the application was last uploaded to the server.
-	  */
-	
-	@Context HttpServletRequest servletRequestlog; 
+		
+	/**
+	 * Method: getLog, GET
+	 * Path: /rest/blackboards/log
+	 * Description: This method returns all loggings stored in the static logstring. 
+	 * Together, they form a table. The logging is displayed from when the server was 
+	 * started and the application was last uploaded to the server.
+	 * @return Response -> Header, Content
+	 */
+	@Context HttpServletRequest servletRequestLog; 
 	@Path("/log") 
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public Response getLog() throws IOException  
 	{
-		//each logging throws its own log entry
-		logstring = logstring.concat("<tr><td>TIMESTAMP (UTC): "+ sdfdate.format(cal.getTime()) + " - " + sdf.format(cal.getTime())+ "</td><td>IP-Adresse: "+ servletRequestget.getRemoteAddr() + "</td><td>hat das Logging abgefragt</td></tr>");
-        String returnstring ="<table border='1'>" + logstring + "</table>";
+		// each logging throws its own log entry
+		createLogEntry(servletRequestLog.getRemoteAddr(), 
+				"hat das Logging abgefragt");
+		
+        String returnString ="<table border='1'>" + logstring + "</table>";
         
-        return Response.ok() //200
-        		.entity(returnstring)
+        return Response.ok() // 200
+        		.entity(returnString)
 				.header("Access-Control-Allow-Origin", "*")
 				.header("Access-Control-Allow-Methods", "GET, POST")
 				.build();
 	}
 	
 	
+	/**
+	 * Checks if the blackBoard of the given name exists already
+	 * @param blackboardName name of the black board which will be searched for
+	 * @return boolean indicating if the object exists ->true means it exists
+	 * 													 false means it does not exist
+	 */
+	private boolean checkForObjectsExistence(String blackboardName) {
+		boolean exists = false;
+		for(int i=0;i<size;i++) {
+			smalljsonObject = (JSONObject) AllBlackboards.jsonObject.get(Integer.toString(i));
+			String string = (String) smalljsonObject.get("name");
+			if(string.equals(blackboardName)) {
+				exists = true;
+			 }
+		}
+		return exists;
+	}
+	
+	/**
+	 * Creates a log entry and appends it to the logString class parameter
+	 * @param ipAddress address of the api method caller
+	 * @param textMessage message which should be appended to the log entry
+	 */
+	private void createLogEntry(String ipAddress, String textMessage) {
+		if (textMessage == null)
+			textMessage = "";
+		logstring = logstring.concat("<tr><td>TIMESTAMP (UTC): " + 
+				sdfdate.format(cal.getTime()) + " - " + sdf.format(cal.getTime()) + 
+				"</td><td>IP-Adresse: "+ ipAddress + 
+				"</td><td>" + textMessage + "</td></tr>");
+	}
 }
