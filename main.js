@@ -36,7 +36,7 @@ class Blackboard {
    * @Param int type
    * @Param String bodyOfData
    **/
-  doXmlHttpReqeust(type, bodyOfData) {
+  doXmlHttpRequest(type, bodyOfData) {
     let url = "";
     let logProperty = "";
 
@@ -80,7 +80,7 @@ class Blackboard {
    * @Param String content
    **/
   sendJSONToServer(content) {
-    this.doXmlHttpReqeust(0, content);
+    this.doXmlHttpRequest(0, content);
   }
 
   /**
@@ -88,7 +88,7 @@ class Blackboard {
    * @Param String key
    **/
   deleteJSONInServer(key) {
-    this.doXmlHttpReqeust(1, key);
+    this.doXmlHttpRequest(1, key);
   }
 
   /**
