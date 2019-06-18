@@ -7,12 +7,11 @@ class Blackboard {
 
   }
 
-
   /**
-   * Calls readTextFile to request newest state of json (callback -> parseJSON -> setJSONData -> set new JSON to class var)
+   * Calls getJSONFromServer to request newest state of json (callback -> parseJSON -> setJSONData -> set new JSON to class var)
    **/
   updateJSONData() {
-    readTextFile(file, parseJSON);
+    getJSONFromServer();
     console.log("14: updatecomplete");
   }
 
@@ -43,17 +42,22 @@ class Blackboard {
 
     switch (type) {
       // send
-      case 0: // und es kommt immer status 200 zurück, auch wenn
-       url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json';
-//	   url = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/json';
-        logProperty = "post";
+      case 0:
+        url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json';
+        logProperty = "HTTP:POST; Operation:sendJSON"; //vorher post
         break;
 
         // delete
       case 1:
         url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/delete';
-//		url = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/delete';
-        logProperty = "delete";
+        logProperty = "HTTP:POST; Operation:deleteJSON"; // vorher delete
+        break;
+
+      case 2:
+        url = "?????" //was ist die url um sich die daten reinzuholen?
+        xmlHttp.overrideMimeType("application/json"); //needed?
+        logProperty = "HTTP:GET; Operation:getJSON"; // vorher get
+        //xmlHttp.open("GET", file, true);
         break;
     }
 
@@ -73,6 +77,16 @@ class Blackboard {
   }
 
 
+  /**
+   * Makes HTTP Request for @file
+   * Calls @callback if request sucessfull (http 200)
+   * @Param file String
+   * @Param callback Operation
+   **/
+  function getJSONFromServer() {
+
+
+  }
   /**
    * Sends JSON Data to Server (only necessary content) via XMLHttpRequest
    * @Param String content
@@ -235,8 +249,20 @@ class Blackboard {
 * Had to be solved as a global function because of asynchronous callbacks of xmlHttpOnReadyStateChange()
 * @Param XMLHttpRequest xmlHttp
 **/
- 
+
 function xmlHttpOnReadyStateChange(xmlHttp) {
+  /*
+  xmlHttp.onreadystatechange = function() {
+    if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
+      clearResultDiv();
+      if (xmlHttp.responseText == "") {
+        alert("Keine Blackboards vorhanden!");
+      }
+      parseJSON(xmlHttp.responseText);
+    }
+  }
+  xmlHttp.send(null);*/
+
 	console.log(xmlHttp.status);
   if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
 	// alert("Activity successfully finished"); // only commented, because it is only useful for debugging
@@ -245,30 +271,6 @@ function xmlHttpOnReadyStateChange(xmlHttp) {
 		alert(xmlHttp.responseText);
 	}
     b.getAllBlackboardNames();
-  }
-
-
-/**
- * Makes HTTP Request for @file
- * Calls @callback if request sucessfull (http 200)
- * @Param file String
- * @Param callback Operation
- **/
-function readTextFile(file, callback) {
-  let rawFile = new XMLHttpRequest();
-  rawFile.overrideMimeType("application/json");
-  rawFile.open("GET", file, true);
-  console.log("get");
-  rawFile.onreadystatechange = function() {
-    if (rawFile.readyState === 4 && rawFile.status == "200") {
-      clearResultDiv();
-      if (rawFile.responseText == "{}") {
-        alert("Keine Blackboards vorhanden!");
-      }
-      callback(rawFile.responseText);
-    }
-  }
-  rawFile.send(null);
 }
 
 /**
@@ -297,11 +299,7 @@ const clearContentButton = document.getElementById('clearBlackboardContent');
 const checkEmptyButton = document.getElementById('checkEmptyBlackboardContent'); //alles abchecken
 const showBlackboardsButton = document.getElementById('showAllBlackboards'); // warum 2x aufrufen bis geht?
 
- const file = "http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json";
-//const file = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/json';
-
-			  
-
+const file = "http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json";
 //const file = "blackboards.json";
 var selectedBlackboard = null;
 
