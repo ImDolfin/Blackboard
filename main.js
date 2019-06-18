@@ -28,41 +28,38 @@ class Blackboard {
   }
 
   /**
-   * Sends JSON Data to Server (only necessary content) with @bodyOfData via XMLHttpRequest depending on @type
+   * Sends JSON Data to Server (only necessary content) with @bodyOfData via XMLHttpRequest depending on @ApiOperation
    * Returns error message from server if action fails
    * After statechange, data is reloaded from server
-   * @Param int type
+   * @Param String ApiOperation
    * @Param String bodyOfData
    **/
-  doXmlHttpRequest(type, bodyOfData) {
+  doXmlHttpRequest(ApiOperation, httpRequestType, bodyOfData) {
     let url = "";
     let logProperty = "";
 
     let xmlHttp = new XMLHttpRequest(); //returns a XMLHttpRequest object
 
-    switch (type) {
-      // send
-      case 0:
+    // setup Request depending on wanted Api operation
+    switch (ApiOperation) {
+      case "send":
         url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json';
         logProperty = "HTTP:POST; Operation:sendJSON"; //vorher post
         break;
-
-        // delete
-      case 1:
+      case "delete":
         url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/delete';
         logProperty = "HTTP:POST; Operation:deleteJSON"; // vorher delete
         break;
-
-      case 2:
-        url = "?????" //was ist die url um sich die daten reinzuholen?
-        xmlHttp.overrideMimeType("application/json"); //needed?
+      case "get":
+        url = "http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json";
+        // url = "blackboards.json";
+        xmlHttp.overrideMimeType("application/json"); //brauchen wir das?
         logProperty = "HTTP:GET; Operation:getJSON"; // vorher get
-        //xmlHttp.open("GET", file, true);
         break;
     }
 
     // Initialize xml request propertys
-    xmlHttp.open("POST", url, true);
+    xmlHttp.open(httpRequestType, url, true);
     console.log(logProperty);
     xmlHttp.setRequestHeader("Content-Type", "text/plain");
 
@@ -76,23 +73,23 @@ class Blackboard {
     }
   }
 
-
   /**
-   * Makes HTTP Request for @file
-   * Calls @callback if request sucessfull (http 200)
-   * @Param file String
-   * @Param callback Operation
-   **/
-  function getJSONFromServer() {
-
-
+  *
+  **/
+  getJSONFromServer() {
+    /* bodyOfData has to be null because no body is send for this GET operation in the XHR request.
+    Not adding null would throw an exception on older browsers */
+    let bodyOfData = null;
+    
+    this.doXmlHttpRequest("get", "GET", bodyOfData);
   }
+
   /**
    * Sends JSON Data to Server (only necessary content) via XMLHttpRequest
    * @Param String content
    **/
   sendJSONToServer(content) {
-    this.doXmlHttpRequest(0, content);
+    this.doXmlHttpRequest("send", "POST", content);
   }
 
   /**
@@ -100,7 +97,7 @@ class Blackboard {
    * @Param String key
    **/
   deleteJSONInServer(key) {
-    this.doXmlHttpRequest(1, key);
+    this.doXmlHttpRequest("delete", "POST", key);
   }
 
   /**
@@ -299,8 +296,6 @@ const clearContentButton = document.getElementById('clearBlackboardContent');
 const checkEmptyButton = document.getElementById('checkEmptyBlackboardContent'); //alles abchecken
 const showBlackboardsButton = document.getElementById('showAllBlackboards'); // warum 2x aufrufen bis geht?
 
-const file = "http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json";
-//const file = "blackboards.json";
 var selectedBlackboard = null;
 
 var b = new Blackboard();
