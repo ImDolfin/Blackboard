@@ -104,13 +104,13 @@ function xmlHttpOnReadyStateChange(xmlHttp, httpMethod) {
         let responsearray = xmlHttp.responseText.split(";");
         switch(responsearray[0]){   // responsearray[0] = custom HTTP API statuscode
           case "SUCCESSFUL":
-            alert("Activity successfully finished: " + responsearray[1]); // responsearray[1] = timestamp
+            alert("Activity successfully finished: " + responsearray[1] +" " + responsearray[2]); // responsearray[1] = timestamp, responsearray[2] = time
             break;
           case "NOT_FOUND":
-            alert("Blackboard does not exist!: " + responsearray[1]);
+            alert("Blackboard does not exist!: " + responsearray[1] +" " + responsearray[2]);
             break;
           case "EXISTS_ALREADY":
-            alert("Blackboard exists already!: " + responsearray[1]);
+            alert("Blackboard exists already!: " + responsearray[1] +" " + responsearray[2]);
             break;
         }
       }
