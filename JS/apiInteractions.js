@@ -1,8 +1,6 @@
-class apiInteractions() {
-  constructor() {
-    this.xmlHttp = new XMLHttpRequest(); //returns a XMLHttpRequest object
-    this.url = "";
-    this.logProperty = "";
+class apiInteractions {
+  constructor(){
+
   }
   /**
    * Sends JSON Data to Server (only necessary content) with @bodyOfData using @httpRequestType via XMLHttpRequest depending on @apiOperation
@@ -13,39 +11,43 @@ class apiInteractions() {
    * @Param String bodyOfData
    **/
   doXmlHttpRequest(apiOperation, httpRequestType, bodyOfData) {
+    let url = "";
+    let logProperty = "";
+
+    let xmlHttp = new XMLHttpRequest(); //returns a XMLHttpRequest object
 
     // setup Request depending on wanted Api operation
     switch (apiOperation) {
       case "send":
-        this.url = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/json';
-        //this.url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json';
-        this.logProperty = "HTTP:POST; Operation:sendJSON";
+        url = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/json';
+        //url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json';
+        logProperty = "HTTP:POST; Operation:sendJSON";
         break;
       case "delete":
-        this.url = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/delete';
-        //this.url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/delete';
-        this.logProperty = "HTTP:POST; Operation:deleteJSON";
+        url = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/delete';
+        //url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/delete';
+        logProperty = "HTTP:POST; Operation:deleteJSON";
         break;
       case "get":
-        this.url = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/json';
-        //this.url = "http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json";
-        this.xmlHttp.overrideMimeType("application/json"); //brauchen wir das?
-        this.logProperty = "HTTP:GET; Operation:getJSON";
+        url = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/json';
+        //url = "http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json";
+        xmlHttp.overrideMimeType("application/json"); //brauchen wir das?
+        logProperty = "HTTP:GET; Operation:getJSON";
         break;
     }
 
     // Initialize xml request propertys
-    this.xmlHttp.open(httpRequestType, this.url, true);
-    console.log(this.logProperty);
-    this.xmlHttp.setRequestHeader("Content-Type", "text/plain");
+    xmlHttp.open(httpRequestType, url, true);
+    console.log(logProperty);
+    xmlHttp.setRequestHeader("Content-Type", "text/plain");
 
     // send request
-    this.xmlHttp.send(bodyOfData);
+    xmlHttp.send(bodyOfData);
 
     // register onreadystate eventhandler by creating a function that calls the function containing the logic
     // (because of asynchronous callstructure - no direct call possible)
-    this.xmlHttp.onreadystatechange = function() {
-      xmlHttpOnReadyStateChange(this.xmlHttp, httpRequestType);
+    xmlHttp.onreadystatechange = function() {
+      xmlHttpOnReadyStateChange(xmlHttp, httpRequestType);
     }
   }
 
@@ -55,7 +57,8 @@ class apiInteractions() {
   getJSONFromServer() {
     /* bodyOfData has to be null because no body is send for this GET operation in the XHR request.
     Not adding null would throw an exception on older browsers */
-    this.doXmlHttpRequest("get", "GET", null);
+    let bodyOfData = null;
+    this.doXmlHttpRequest("get", "GET", bodyOfData);
   }
 
   /**
@@ -92,11 +95,14 @@ function xmlHttpOnReadyStateChange(xmlHttp, httpMethod) {
       // parseJSON(xmlHttp.responseText);
       parseJSON(xmlHttp.responseText);
       console.log("GET: " + xmlHttp.responseText);
-    }
-    else if (httpMethod === "POST") {
+
+
+    } else if (httpMethod === "POST") {
       console.log(xmlHttp.status);
       if (xmlHttp.status == "200") {
-        /*switch(xmlHttp.responseText){
+
+        let responsearray[] = xmlHttp.responseText.split(";");
+        switch(responsearray[0]){   // responsearray[0] = custom HTTP API statuscode
           case "SUCCESSFUL":
             alert("Activity successfully finished"); // only commented, because it is only useful for debugging
             break;
@@ -106,12 +112,11 @@ function xmlHttpOnReadyStateChange(xmlHttp, httpMethod) {
           case "EXISTS_ALREADY":
             alert("Blackboard exists already!");
             break;
-        }*/
-        if (xmlHttp.responseText != "") {
-          alert(xmlHttp.responseText);
         }
-        // } else if (xmlHttp.status == "404" || xmlHttp.status == "400") {
-        //   alert(xmlHttp.responseText);
+      /*  if (xmlHttp.responseText != "") {
+          alert(xmlHttp.responseText);
+        }*/
+
 
       }
       console.log("POST 282: " + xmlHttp.responseText);
