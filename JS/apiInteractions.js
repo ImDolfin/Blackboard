@@ -101,23 +101,18 @@ function xmlHttpOnReadyStateChange(xmlHttp, httpMethod) {
       console.log(xmlHttp.status);
       if (xmlHttp.status == "200") {
 
-        let responsearray[] = xmlHttp.responseText.split(";");
+        let responsearray = xmlHttp.responseText.split(";");
         switch(responsearray[0]){   // responsearray[0] = custom HTTP API statuscode
           case "SUCCESSFUL":
-            alert("Activity successfully finished"); // only commented, because it is only useful for debugging
+            alert("Activity successfully finished: " + responsearray[1]); // responsearray[1] = timestamp
             break;
           case "NOT_FOUND":
-            alert("Blackboard does not exist!");
+            alert("Blackboard does not exist!: " + responsearray[1]);
             break;
           case "EXISTS_ALREADY":
-            alert("Blackboard exists already!");
+            alert("Blackboard exists already!: " + responsearray[1]);
             break;
         }
-      /*  if (xmlHttp.responseText != "") {
-          alert(xmlHttp.responseText);
-        }*/
-
-
       }
       console.log("POST 282: " + xmlHttp.responseText);
       b.getAllBlackboardNames();
