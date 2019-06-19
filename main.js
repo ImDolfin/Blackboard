@@ -44,16 +44,18 @@ class Blackboard {
     // setup Request depending on wanted Api operation
     switch (apiOperation) {
       case "send":
-        url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json';
+        url = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/json';
+        //url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json';
         logProperty = "HTTP:POST; Operation:sendJSON";
         break;
       case "delete":
-        url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/delete';
+        url = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/delete';
+        //url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/delete';
         logProperty = "HTTP:POST; Operation:deleteJSON";
         break;
       case "get":
-        url = "http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json";
-        // url = "blackboards.json";
+        url = 'http://localhost:8080/VerteilteSySApiREST/rest/blackboards/json';
+        //url = "http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json";
         xmlHttp.overrideMimeType("application/json"); //brauchen wir das?
         logProperty = "HTTP:GET; Operation:getJSON";
         break;
@@ -183,7 +185,8 @@ class Blackboard {
 
       // only get if empty or not
       if (checkIfEmpty === true) {
-        ((this.boards[this.position].text).lenght === 0) ? textForBlackboard.innerHTML = "Leere Notiz": textForBlackboard.innerHTML = "Notiz mit Inhalt";
+        //check for empty string redudant, bc sometimes browser wont get the lenght 0 even if the lenght is 0
+        ((this.boards[this.position].text).lenght == 0 || this.boards[this.position].text === "") ? textForBlackboard.innerHTML = "Leere Notiz": textForBlackboard.innerHTML = "Notiz mit Inhalt";
       }
       // Get content of boards
       else {
@@ -250,33 +253,59 @@ class Blackboard {
  * @Param String httpMethod
  **/
 function xmlHttpOnReadyStateChange(xmlHttp, httpMethod) {
-  if (httpMethod === "GET"){
+if (xmlHttp.readyState === 4) {
+  if (httpMethod === "GET") {
     // TODO: handle this version of the setTextFile()
-    if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
+    if (xmlHttp.status == "200") {
       clearResultDiv();
     }
+    // parseJSON(xmlHttp.responseText);
     parseJSON(xmlHttp.responseText);
-  }
-  else if(httpMethod === "POST"){
+    console.log("GET: " + xmlHttp.responseText);
+
+
+  } else if (httpMethod === "POST") {
     console.log(xmlHttp.status);
-    if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
-      // alert("Activity successfully finished"); // only commented, because it is only useful for debugging
-    } else if (xmlHttp.readyState === 4 && (xmlHttp.status == "404" || xmlHttp.status == "409")) {
-      alert(xmlHttp.responseText);
+    if (xmlHttp.status == "200") {
+      /*switch(xmlHttp.responseText){
+        case "SUCCESSFUL":
+          alert("Activity successfully finished"); // only commented, because it is only useful for debugging
+          break;
+        case "NOT_FOUND":
+          alert("Blackboard does not exist!");
+          break;
+        case "EXISTS_ALREADY":
+          alert("Blackboard exists already!");
+          break;
+      }*/
+      if (xmlHttp.responseText != "") {
+        alert(xmlHttp.responseText);
+      }
+      // } else if (xmlHttp.status == "404" || xmlHttp.status == "400") {
+      //   alert(xmlHttp.responseText);
+
     }
+    console.log("POST 282: " + xmlHttp.responseText);
     b.getAllBlackboardNames();
   }
+} else {
+  console.log("Warten auf XmlHttpRequest readyState 4; Aktueller State: " + xmlHttp.readyState);
+}
 }
 
 /**
+ * TODO: JSON.parse throws diffrent errors, however without adapting the code worked like this without errors. If the retrned @text gets loged and hardcoded in, no errors are thrown. Maybe API bug?
  * Parses JSON and Calls setter of Blackboard
  * @Param text JSON
  **/
 function parseJSON(text) {
+  //  let t = "" + text;  // b.setJSONData(JSON.parse('{"0":{"name":"jhv","text":""}}'));
+  //  let tex = '{"0":{"name":"jhv","text":""}}';
+  console.log("269: " + text);
   b.setJSONData(JSON.parse(text));
   console.log("269: " + text);
+  text
 }
-
 
 
 /*
@@ -317,7 +346,6 @@ function clearResultDiv() {
  * @Param bool checkIfEmpty
  **/
 function showContentWrapper(name, checkIfEmpty) {
-  let name = blackboardName.value;
   if (name != "") {
     let res = b.getBlackboardContent(name, checkIfEmpty);
     if (res === false) {
