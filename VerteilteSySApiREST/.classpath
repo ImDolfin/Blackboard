@@ -3,19 +3,43 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="build/json-20180813.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
 			<attribute name="module" value="true"/>
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/U51210/git/verteiltsys/VerteilteSySApiREST/build/json-simple-1.1.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/U51210/git/verteiltsys/VerteilteSySApiREST/build/commons-io-2.6.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
-	<classpathentry kind="lib" path="C:/DHBW-Studium/6.Semester/Verteilte Systeme/javax.ws.rs-api-2.0-m10.jar"/>
-	<classpathentry kind="lib" path="C:/DHBW-Studium/6.Semester/Verteilte Systeme/json-simple-1.1.1.jar"/>
-	<classpathentry kind="lib" path="C:/DHBW-Studium/6.Semester/Verteilte Systeme/commons-io-2.6.jar"/>
-	<classpathentry kind="lib" path="C:/DHBW-Studium/6.Semester/Verteilte Systeme/json-20180813.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/aopalliance-repackaged-2.5.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/commons-io-2.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/hk2-api-2.5.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/hk2-locator-2.5.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/hk2-utils-2.5.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jakarta.activation-api-1.2.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jakarta.annotation-api-1.3.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jakarta.inject-2.5.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jakarta.json.bind-api-1.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jakarta.json-1.1.5.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jakarta.json-api-1.1.5.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jakarta.persistence-api-2.2.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jakarta.servlet-api-4.0.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jakarta.ws.rs-api-2.1.5.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jakarta.ws.rs-api-2.1.5-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jakarta.xml.bind-api-2.3.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/javassist-3.22.0-GA.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jersey-client.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jersey-common.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jersey-container-servlet.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jersey-container-servlet-core.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jersey-hk2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jersey-media-jaxb.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jersey-media-json-binding.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jersey-media-sse.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/jersey-server.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/org.osgi.core-4.2.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/osgi-resource-locator-1.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/validation-api-2.0.1.Final.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sperl/Blackboard/VerteilteSySApiREST/yasson-1.0.3.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
