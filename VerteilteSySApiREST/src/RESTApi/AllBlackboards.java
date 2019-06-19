@@ -232,7 +232,7 @@ public class AllBlackboards {
 		}
 		Response.Status status;
 		if(error == NOT_FOUND) {
-			status = Response.Status.OK; //404 w‰re auch i.O. (s.o.)
+			status = Response.Status.OK; //404 w√§re auch i.O. (s.o.)
 		}
 		else {
 			status = Response.Status.OK; //200
@@ -297,15 +297,15 @@ public class AllBlackboards {
 	@Path("/log") 
 	@GET
 	@Produces(MediaType.TEXT_HTML)
-	public Response getLog() throws IOException  
+	public Response getLog()
 	{
 		// each logging throws its own log entry
 		createLogEntry(servletRequestLog.getRemoteAddr(), 
 				"hat das Logging abgefragt");
 		
-        String returnString ="<table border='1'>" + logstring + "</table>";
+        	String returnString ="<table border='1'>" + logstring + "</table>";
         
-        return Response.ok() // 200
+        	return Response.ok() // 200
         		.entity(returnString)
 				.header("Access-Control-Allow-Origin", "*")
 				.header("Access-Control-Allow-Methods", "GET, POST")
