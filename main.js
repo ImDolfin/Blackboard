@@ -11,7 +11,7 @@ class Blackboard {
    * Calls getJSONFromServer to request newest state of json (callback -> parseJSON -> setJSONData -> set new JSON to class var)
    **/
   updateJSONData() {
-    getJSONFromServer();
+    this.getJSONFromServer();
     console.log("14: updatecomplete");
   }
 
@@ -28,33 +28,34 @@ class Blackboard {
   }
 
   /**
-   * Sends JSON Data to Server (only necessary content) with @bodyOfData via XMLHttpRequest depending on @ApiOperation
+   * Sends JSON Data to Server (only necessary content) with @bodyOfData using @httpRequestType via XMLHttpRequest depending on @apiOperation
    * Returns error message from server if action fails
    * After statechange, data is reloaded from server
-   * @Param String ApiOperation
+   * @Param String apiOperation
+   * @Param String httpRequestType
    * @Param String bodyOfData
    **/
-  doXmlHttpRequest(ApiOperation, httpRequestType, bodyOfData) {
+  doXmlHttpRequest(apiOperation, httpRequestType, bodyOfData) {
     let url = "";
     let logProperty = "";
 
     let xmlHttp = new XMLHttpRequest(); //returns a XMLHttpRequest object
 
     // setup Request depending on wanted Api operation
-    switch (ApiOperation) {
+    switch (apiOperation) {
       case "send":
         url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json';
-        logProperty = "HTTP:POST; Operation:sendJSON"; //vorher post
+        logProperty = "HTTP:POST; Operation:sendJSON";
         break;
       case "delete":
         url = 'http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/delete';
-        logProperty = "HTTP:POST; Operation:deleteJSON"; // vorher delete
+        logProperty = "HTTP:POST; Operation:deleteJSON";
         break;
       case "get":
         url = "http://blackboardproject.us-east-2.elasticbeanstalk.com/rest/blackboards/json";
         // url = "blackboards.json";
         xmlHttp.overrideMimeType("application/json"); //brauchen wir das?
-        logProperty = "HTTP:GET; Operation:getJSON"; // vorher get
+        logProperty = "HTTP:GET; Operation:getJSON";
         break;
     }
 
@@ -69,18 +70,18 @@ class Blackboard {
     // register onreadystate eventhandler by creating a function that calls the function containing the logic
     // (because of asynchronous callstructure - no direct call possible)
     xmlHttp.onreadystatechange = function() {
-      xmlHttpOnReadyStateChange(xmlHttp);
+      xmlHttpOnReadyStateChange(xmlHttp, httpRequestType);
     }
   }
 
   /**
-  *
-  **/
+   *
+   **/
   getJSONFromServer() {
     /* bodyOfData has to be null because no body is send for this GET operation in the XHR request.
     Not adding null would throw an exception on older browsers */
     let bodyOfData = null;
-    
+
     this.doXmlHttpRequest("get", "GET", bodyOfData);
   }
 
@@ -242,32 +243,29 @@ class Blackboard {
 }
 
 /**
-* Eventhandler for the readystatechange event
-* Had to be solved as a global function because of asynchronous callbacks of xmlHttpOnReadyStateChange()
-* @Param XMLHttpRequest xmlHttp
-**/
-
-function xmlHttpOnReadyStateChange(xmlHttp) {
-  /*
-  xmlHttp.onreadystatechange = function() {
+ * Eventhandler for the readystatechange event
+ * Had to be solved as a global function because of asynchronous callbacks of xmlHttpOnReadyStateChange()
+ * Differentiate between HTTP Method (@httpMethod)
+ * @Param XMLHttpRequest xmlHttp
+ * @Param String httpMethod
+ **/
+function xmlHttpOnReadyStateChange(xmlHttp, httpMethod) {
+  if (httpMethod === "GET"){
+    // TODO: handle this version of the setTextFile()
     if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
       clearResultDiv();
-      if (xmlHttp.responseText == "") {
-        alert("Keine Blackboards vorhanden!");
-      }
-      parseJSON(xmlHttp.responseText);
     }
+    parseJSON(xmlHttp.responseText);
   }
-  xmlHttp.send(null);*/
-
-	console.log(xmlHttp.status);
-  if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
-	// alert("Activity successfully finished"); // only commented, because it is only useful for debugging
-  }
-  else if (xmlHttp.readyState === 4 && (xmlHttp.status == "404" || xmlHttp.status == "409" )) {
-		alert(xmlHttp.responseText);
-	}
+  else if(httpMethod === "POST"){
+    console.log(xmlHttp.status);
+    if (xmlHttp.readyState === 4 && xmlHttp.status == "200") {
+      // alert("Activity successfully finished"); // only commented, because it is only useful for debugging
+    } else if (xmlHttp.readyState === 4 && (xmlHttp.status == "404" || xmlHttp.status == "409")) {
+      alert(xmlHttp.responseText);
+    }
     b.getAllBlackboardNames();
+  }
 }
 
 /**
@@ -310,8 +308,34 @@ function clearResultDiv() {
   }
 }
 
-//-----------------------------------------------------------------
-// In this section, eventListeners are added to the specific Buttons
+// TODO: test this implementation
+/**
+ * Wrapper to handle return of overloaded getBlackboardContent()
+ * Checks whether inputs are valid -> if not, alerts are thrown
+ * (if everthing is valid) depending on @checkIfEmpty a div either containing the content or the state (empty/note empty) for given blackboard(@name) is returned
+ * @Param String name
+ * @Param bool checkIfEmpty
+ **/
+function showContentWrapper(name, checkIfEmpty) {
+  let name = blackboardName.value;
+  if (name != "") {
+    let res = b.getBlackboardContent(name, checkIfEmpty);
+    if (res === false) {
+      alert("Kein Blackboard mit diesem Namen vorhanden!");
+    } else {
+      clearResultDiv();
+      document.body.appendChild(res);
+    }
+  } else {
+    alert("Sie müssen den Namen des Blackboards eingeben!");
+  }
+}
+
+/*-----------------------------------------------------------------
+In this section eventListeners are added to the specific buttons
+They call the respective opertions of the Blackboard class and handle the Returns
+These return value(s) and the userinputs of the InputTexts are handled and alerts are thrown in the DOM they are not valid
+*/
 
 //checks whether inputs are valid -> if not, an alert is thrown
 createBlackboardButton.addEventListener("click", function() {
@@ -355,38 +379,14 @@ clearContentButton.addEventListener("click", function() {
   }
 })
 
-//checks whether inputs are valid -> if not, an alert is thrown
-// if result of getBlackboardContent with param "false", which means - get the content - is not false, than the content of a specific blackboard is shown in the browser
+//Calls the showContentWrapper()
 showContentButton.addEventListener("click", function() {
-  let name = blackboardName.value;
-  if (name != "") {
-    let res = b.getBlackboardContent(name, false);
-    if (res === false) {
-      alert("Kein Blackboard mit diesem Namen vorhanden!");
-    } else {
-      clearResultDiv();
-      document.body.appendChild(res);
-    }
-  } else {
-    alert("Sie müssen den Namen des Blackboards eingeben!");
-  }
+  showContentWrapper(blackboardName.value, false);
 })
 
-//checks whether inputs are valid -> if not, an alert is thrown
-// if result of getBlackboardContent with param "true", which means - check whether there is content - is not false, than the content of a specific blackboard is shown in the browser
+//Calls the showContentWrapper()
 checkEmptyButton.addEventListener("click", function() {
-  let name = blackboardName.value;
-  if (name != "") {
-    let res = b.getBlackboardContent(name, true);
-    if (res === false) {
-      alert("Kein Blackboard mit diesem Namen vorhanden!");
-    } else {
-      clearResultDiv();
-      document.body.appendChild(res);
-    }
-  } else {
-    alert("Sie müssen den Namen des Blackboards eingeben!");
-  }
+  showContentWrapper(blackboardName.value, true);
 })
 
 //calls function getAllBlackboardNames
