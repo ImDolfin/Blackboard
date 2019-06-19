@@ -27,8 +27,9 @@ public class AllBlackboards {
 	// original JSON file, but the path is not visible on Amazon aws	
 	private static JSONObject jsonObject = new JSONObject();		
 	
-	private final String NOT_FOUND = "Blackboard does not exist!"; 
-	private final String EXISTS_ALREADY = "Blackboard already exists :) !";
+	private final String SUCCESSFUL = "SUCCESSFUL";  //Activity successful finished!
+	private final String NOT_FOUND = "NOT_FOUND";  //Blackboard does not exist!
+	private final String EXISTS_ALREADY = "EXISTS_ALREADY"; //Blackboard already exists !
 		
 	// Data storage for LOGGING
 	private static String logstring = "";								
@@ -63,13 +64,13 @@ public class AllBlackboards {
 	@Path("/json")
 	@POST
 	@Consumes(MediaType.TEXT_PLAIN) 									
-	@Produces(MediaType.TEXT_PLAIN) 	
+	//@Produces(MediaType.TEXT_PLAIN) 	
 	public Response saveBlackboards(String text) { 
 
 		// Split the string into substrings
 		String[] substrings = text.split(","); 						
 		boolean exists = false;										
-		String error = null;
+		String error = SUCCESSFUL;
 		String mode = null;
 		int size = AllBlackboards.jsonObject.size();
 		JSONObject smalljsonObject = new JSONObject();					
@@ -135,20 +136,28 @@ public class AllBlackboards {
 					substrings[0] + 
 					"' aendern. FEHLGESCHLAGEN - BLACKBOARD NICHT EXISTENT");		
 		}
-		Response.Status status;
+		int test;
+		Response.Status status = null;
 		if(error == EXISTS_ALREADY) {
-			status = Response.Status.CONFLICT; //409
+			//400 -> "The request could not be understood by the server due to malformed syntax. The client SHOULD NOT repeat the request without modifications."
+			//status = Response.Status.BAD_REQUEST; 
+			
+			//409 -> would be okay too
+			status = Response.Status.OK; 
+			
 		}
 		else if(error == NOT_FOUND) {
-			status = Response.Status.NOT_FOUND; //404
-
+			//status = Response.Status.ACCEPTED; //404
+			status = Response.Status.OK;
 		}
-		else {
+		else if(error == SUCCESSFUL) {
 			status = Response.Status.OK; //200
 		}
 		
+		String responsetext = generateResponseText(error);
+				
 		return Response.status(status)
-				.entity(error)
+				.entity(responsetext)
 				.header("Access-Control-Allow-Origin", "*")
 				.header("Access-Control-Allow-Methods", "GET, POST")
 				.build();
@@ -223,13 +232,15 @@ public class AllBlackboards {
 		}
 		Response.Status status;
 		if(error == NOT_FOUND) {
-			status = Response.Status.NOT_FOUND; //404
+			status = Response.Status.OK; //404 wäre auch i.O. (s.o.)
 		}
 		else {
 			status = Response.Status.OK; //200
 		}
+		
+		String responsetext = generateResponseText(error);
 		return Response.status(status)
-				.entity(error)
+				.entity(responsetext)
 				.header("Access-Control-Allow-Origin", "*")
 				.header("Access-Control-Allow-Methods", "GET, POST")
 				.build();	 
@@ -267,7 +278,7 @@ public class AllBlackboards {
 		// the JSON object is returned as string, also in case of 
 		// an empty object -> (easier client-side processing)
 		string = AllBlackboards.jsonObject.toJSONString();		
-		return Response.ok() //200
+		return Response.status(Response.Status.OK) //200
 				.entity(string)
 				.header("Access-Control-Allow-Origin", "*")
 				.header("Access-Control-Allow-Methods", "GET, POST")
@@ -334,5 +345,16 @@ public class AllBlackboards {
 				sdfdate.format(cal.getTime()) + " - " + sdf.format(cal.getTime()) + 
 				"</td><td>IP-Adresse: "+ ipAddress + 
 				"</td><td>" + textMessage + "</td></tr>");
+	}
+	
+	/**
+	 * Creates a log entry and appends it to the logString class parameter
+	 * @param ipAddress address of the api method caller
+	 * @param textMessage message which should be appended to the log entry
+	 */
+	private String generateResponseText(String error) {
+		
+		String responseText = error + ";" + sdfdate.format(cal.getTime()) + ";" + sdf.format(cal.getTime()); //
+		return responseText;
 	}
 }

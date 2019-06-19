@@ -2,6 +2,9 @@
     <wb-module deploy-name="VerteilteSySApiREST">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <dependent-module archiveName="json-20180813.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/Users/U51210/git/verteiltsys/VerteilteSySApiREST/build/json-20180813.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <dependent-module archiveName="json-simple-1.1.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/Users/U51210/git/verteiltsys/VerteilteSySApiREST/build/json-simple-1.1.1.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
